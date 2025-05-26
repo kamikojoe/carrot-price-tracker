@@ -1,6 +1,8 @@
-body { font-family: system-ui, sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
-h1   { text-align: center; }
-section { margin-block: 1rem; }
-table { width: 100%; border-collapse: collapse; }
-th, td { border: 1px solid #ccc; padding: .5rem; text-align: center; }
-input, button { margin-right: .5rem; }
+body { font-family: system-ui, sans-serif; max-width: 780px; margin: auto; }
+
+table            { width: 100%; border-collapse: collapse; margin: 1rem auto; }
+th, td           { border: 1px solid #ccc; padding: .6rem; text-align: center; }
+thead            { background: #f3f3f3; }
+section#form,
+section#search   { text-align: center; }       /* 表單置中 */
+button           { padding: .4rem .8rem; }
