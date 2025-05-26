@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>胡蘿蔔物價追蹤</title>
+<link rel="stylesheet" href="styles.css">
+<h1>胡蘿蔔物價追蹤</h1>
+
+<section id="form">
+    <input type="date"   id="date">
+    <input type="text"   id="product" placeholder="商品名稱" value="胡蘿蔔">
+    <input type="number" id="price"   placeholder="價格 (元)">
+    <button id="add">新增</button>
+</section>
+
+<section id="search">
+    <input type="text" id="kw" placeholder="搜尋商品…">
+</section>
+<section>
+    <button id="reload">重新匯入 CSV</button>
+</section>
+
+<table id="list">
+    <thead><tr><th>日期</th><th>商品</th><th>價格</th></tr></thead>
+    <tbody></tbody>
+</table>
+
+<script src="app.js" type="module"></script>

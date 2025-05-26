@@ -1,0 +1,6 @@
+body { font-family: system-ui, sans-serif; max-width: 700px; margin: auto; padding: 1rem; }
+h1   { text-align: center; }
+section { margin-block: 1rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 1px solid #ccc; padding: .5rem; text-align: center; }
+input, button { margin-right: .5rem; }
