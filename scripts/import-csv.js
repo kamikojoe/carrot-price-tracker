@@ -23,6 +23,8 @@ const parser = parse({
     // delimiter: '\t',
 });
 
+const isDate   = (txt) => /^\d{2,3}[\/.-]\d{2}[\/.-]\d{2}$/.test(txt);
+
 const rows = [];
 let first = false; // 是否輸出第一row欄位名稱
 
@@ -44,6 +46,7 @@ fs.createReadStream(csvPath)
         const date  = nkeys['日期']  || nkeys['日付'] || nkeys['Date'];
         const price = nkeys['平均價(元/公斤)'] || nkeys['平均價'] || nkeys['Price'];
 
+        if (!isDate(date)) return;               // 不是日期 → 跳過（小計、空行）
         if (!date || !price) return;             // 欄位缺失就跳過
         rows.push({ date, price: Number(price) });
     })

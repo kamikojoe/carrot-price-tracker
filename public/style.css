@@ -1,8 +1,13 @@
-body { font-family: system-ui, sans-serif; max-width: 780px; margin: auto; }
+body        { font-family: system-ui,sans-serif; max-width:900px; margin:auto; }
+h1         { text-align:center; margin:1rem 0; }
+table       { width: 100%; border-collapse: collapse; margin:1rem auto; }
+th,td       { border:1px solid #ccc; padding:.6rem; text-align:center; }
+thead th    { background:#f6f6f6; }
+#form, #search, #reload { text-align:center; margin-block:.5rem; }
 
-table            { width: 100%; border-collapse: collapse; margin: 1rem auto; }
-th, td           { border: 1px solid #ccc; padding: .6rem; text-align: center; }
-thead            { background: #f3f3f3; }
-section#form,
-section#search   { text-align: center; }       /* 表單置中 */
-button           { padding: .4rem .8rem; }
+button      { padding:.4rem .8rem; cursor:pointer; }
+input       { padding:.3rem .5rem; }
+
+#pagination { text-align:center; margin:.5rem 0; }
+#pagination .page-btn { margin:0 .2rem; padding:.3rem .6rem; cursor:pointer; }
+#pagination .active   { background:#333; color:#fff; }

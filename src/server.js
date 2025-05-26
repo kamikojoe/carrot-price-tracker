@@ -20,13 +20,25 @@ app.post('/api/prices', (req, res) => {
     res.json({ msg: 'OK' });
 });
 
-/* 查詢（可帶 keyword）*/
+/* 查詢（支援關鍵字 + 分頁） */
 app.get('/api/prices', (req, res) => {
-    const kw = (req.query.q || '').trim();
-    const rows = kw
-        ? db.prepare('SELECT * FROM prices WHERE product LIKE ? ORDER BY date DESC').all(`%${kw}%`)
-        : db.prepare('SELECT * FROM prices ORDER BY date DESC LIMIT 100').all();
-    res.json(rows);
+    const kw       = (req.query.q || '').trim();
+    const page     = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = 100;
+
+    const whereSql = kw ? 'WHERE product LIKE ?' : '';
+    const countSql = `SELECT COUNT(*) AS total FROM prices ${whereSql}`;
+    const total    = kw
+        ? db.prepare(countSql).get(`%${kw}%`).total
+        : db.prepare(countSql).get().total;
+
+    const offset   = (page - 1) * pageSize;
+    const dataSql  = `SELECT * FROM prices ${whereSql} ORDER BY date DESC LIMIT ? OFFSET ?`;
+
+    const params   = kw ? [`%${kw}%`, pageSize, offset] : [pageSize, offset];
+    const rows     = db.prepare(dataSql).all(...params);
+
+    res.json({ rows, totalPages: Math.ceil(total / pageSize), page });
 });
 
 app.post('/api/reload', (_, res) => {
@@ -49,6 +61,19 @@ app.post('/api/reload', (_, res) => {
         res.status(500).json({ msg: e.message });
     }
 });
+
+/* 折線圖資料：按日期 ASC */
+app.get('/api/trend', (req, res) => {
+    const product = req.query.product || '胡蘿蔔';
+    const rows = db.prepare(`
+      SELECT date, price
+      FROM prices
+      WHERE product = ?
+      ORDER BY date ASC
+    `).all(product);
+    res.json(rows);
+});
+
 
 /* 啟動 */
 const PORT = process.env.PORT || 3000;
