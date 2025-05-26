@@ -3,6 +3,15 @@
 <title>胡蘿蔔物價追蹤</title>
 <link rel="stylesheet" href="style.css">
 <h1>胡蘿蔔物價追蹤</h1>
+
+<label>
+    級距：
+    <select id="gran">
+        <option value="day">日</option>
+        <option value="month">月</option>
+        <option value="year">年</option>
+    </select>
+</label>
 <!--折線圖-->
 <canvas id="trend" height="150"></canvas>
 
@@ -10,13 +19,13 @@
     <input type="date"   id="date">
     <input type="text"   id="product" placeholder="商品名稱" value="胡蘿蔔">
     <input type="number" id="price"   placeholder="價格 (元)">
-    <button id="add">新增</button>
+    <button id="add">新增資料</button>
 </section>
 
 <section id="search">
     <input type="text" id="kw" placeholder="搜尋商品…">
 </section>
-<section>
+<section id="reload-part">
     <button id="reload">重新匯入 CSV</button>
 </section>
 

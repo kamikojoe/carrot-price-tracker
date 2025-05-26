@@ -62,16 +62,51 @@ app.post('/api/reload', (_, res) => {
     }
 });
 
-/* 折線圖資料：按日期 ASC */
+/* 折線圖資料：gran = day | month | year，並轉民國年 */
 app.get('/api/trend', (req, res) => {
     const product = req.query.product || '胡蘿蔔';
-    const rows = db.prepare(`
-      SELECT date, price
-      FROM prices
-      WHERE product = ?
-      ORDER BY date ASC
-    `).all(product);
-    res.json(rows);
+    const gran    = req.query.gran || 'day';   // day | month | year
+
+    let sql;
+    if (gran === 'year') {
+        // → 113, 114 ...
+        sql = `
+          SELECT (CAST(strftime('%Y', date) AS INTEGER) - 1911) AS period,
+                 AVG(price) AS avg_price
+          FROM prices
+          WHERE product = ?
+          GROUP BY period
+          ORDER BY period
+        `;
+    } else if (gran === 'month') {
+        // → 113-05, 113-06 ...
+        sql = `
+          SELECT printf('%d-%02d',
+                        CAST(strftime('%Y', date) AS INTEGER) - 1911,
+                        CAST(strftime('%m', date) AS INTEGER))     AS period,
+                 AVG(price) AS avg_price
+          FROM prices
+          WHERE product = ?
+          GROUP BY period
+          ORDER BY period
+        `;
+    } else { // day
+        // → 113-05-27 ...
+        sql = `
+          SELECT printf('%d-%02d-%02d',
+                        CAST(strftime('%Y', date) AS INTEGER) - 1911,
+                        CAST(strftime('%m', date) AS INTEGER),
+                        CAST(strftime('%d', date) AS INTEGER))     AS period,
+                 AVG(price) AS avg_price
+          FROM prices
+          WHERE product = ?
+          GROUP BY period
+          ORDER BY period
+        `;
+    }
+
+    const rows = db.prepare(sql).all(product);
+    res.json({ gran, rows });
 });
 
 

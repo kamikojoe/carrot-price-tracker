@@ -23,13 +23,22 @@ const parser = parse({
     // delimiter: '\t',
 });
 
-const isDate   = (txt) => /^\d{2,3}[\/.-]\d{2}[\/.-]\d{2}$/.test(txt);
-
 const rows = [];
 let first = false; // 是否輸出第一row欄位名稱
 
+const isDate = (txt) => /^\d{2,4}[-\/.]\d{2}[-\/.]\d{2}$/.test(txt);
+
+// 民國年 114/05/25 → 2025-05-25
+const roc2iso = (d) => {
+    const m = d.match(/^(\d{2,3})[\/.-](\d{2})[\/.-](\d{2})$/);
+    if (!m) return d.replace(/\//g, '-');      // 已是西元或含破折號，就直接換成 -
+    const [_, y, mo, da] = m;
+    const isoY = (+y + 1911).toString();
+    return `${isoY}-${mo}-${da}`;
+};
+
 fs.createReadStream(csvPath)
-    .pipe(iconv.decodeStream('big5'))      // Big5 → UTF-8，若已是 UTF-8 就拿掉這行
+    .pipe(iconv.decodeStream('big5'))
     .pipe(parser)
     .on('data', (record) => {
         if (first) {
@@ -38,17 +47,19 @@ fs.createReadStream(csvPath)
         }
 
         const norm = (s) => s.replace(/\s|[\u3000\uFEFF]/g, '');
-        // \s: 一般空白；\u3000: 全形空格；\uFEFF: BOM
         const nkeys = Object.fromEntries(
             Object.entries(record).map(([k, v]) => [norm(k), v])
         );
 
-        const date  = nkeys['日期']  || nkeys['日付'] || nkeys['Date'];
-        const price = nkeys['平均價(元/公斤)'] || nkeys['平均價'] || nkeys['Price'];
+        const dateRaw = nkeys['日期'] || nkeys['日　　期'] || nkeys['成交日期'] || nkeys['Date'];
+        const price   = nkeys['平均價(元/公斤)'] || nkeys['平均價'] || nkeys['Price'];
 
-        if (!isDate(date)) return;               // 不是日期 → 跳過（小計、空行）
-        if (!date || !price) return;             // 欄位缺失就跳過
-        rows.push({ date, price: Number(price) });
+        if (!dateRaw || !price) return;        // 空值跳過
+
+        const dateISO = roc2iso(dateRaw);      // ★ 轉成 ISO
+        if (!isDate(dateISO)) return;          // 小計或異常格式跳過
+
+        rows.push({ date: dateISO, price: Number(price) });
     })
     .on('end', () => {
         console.log(`CSV 讀取完畢，共 ${rows.length} 筆，準備匯入…`);

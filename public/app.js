@@ -8,10 +8,11 @@ let currentKw   = '';
 
 /* ---------- 折線圖 ---------- */
 async function drawChart() {
-    const res  = await fetch(`/api/trend?product=胡蘿蔔`);
-    const data = await res.json();
-    const labels = data.map(d => d.date);
-    const prices = data.map(d => d.price);
+    const gran   = $('#gran').value;
+    const res    = await fetch(`/api/trend?product=胡蘿蔔&gran=${gran}`);
+    const { rows } = await res.json();
+    const labels = rows.map(r => r.period);
+    const prices = rows.map(r => r.avg_price);
 
     const ctx = $('#trend').getContext('2d');
     if (chart) chart.destroy();          // 重新繪製
@@ -21,7 +22,10 @@ async function drawChart() {
             labels,
             datasets: [{ label: '胡蘿蔔 (元/公斤)', data: prices, tension: .2 }]
         },
-        options: { responsive: true, scales: { x: { ticks: { display:false } } } }
+        options: {
+            responsive: true,
+            scales: { x: { ticks: { autoSkip: true, maxTicksLimit: 12 } } } // 最多 12 個標籤
+        }
     });
 }
 
@@ -81,6 +85,9 @@ $('#reload').onclick = async () => {
     drawChart();
     load(1, '');
 };
+
+$('#gran').onchange = () => drawChart();
+
 
 /* ---------- 初始 ---------- */
 drawChart();
