@@ -19,8 +19,6 @@ const parser = parse({
     columns: true,
     skip_empty_lines: true,
     trim: true,
-    // 若分隔符是 Tab 或分號，轉這裡：
-    // delimiter: '\t',
 });
 
 const rows = [];
@@ -74,4 +72,4 @@ fs.createReadStream(csvPath)
         console.log('匯入完成！');
         // console.log('試試看：curl http://localhost:3000/api/prices?q=胡蘿蔔&limit=5');
     })
-    .on('error', (err) => console.error('💥 解析錯誤：', err.message));
+    .on('error', (err) => console.error('解析錯誤：', err.message));
